@@ -188,15 +188,18 @@ export function HandoffPanel() {
           disabled={stepIndex === 0 || isNavigating}>
           Previous
         </button>
-        <button type="button" className="handoff-nav-btn" onClick={endHandoff}>
-          Skip
-        </button>
         <button
           type="button"
-          className="handoff-nav-btn primary"
+          className="handoff-nav-btn handoff-nav-btn--next primary"
           onClick={nextStep}
           disabled={isNavigating}>
           {stepIndex >= totalSteps - 1 ? "Done" : "Next"}
+        </button>
+        <button
+          type="button"
+          className="handoff-nav-btn handoff-nav-btn--skip"
+          onClick={endHandoff}>
+          Skip
         </button>
       </div>
     </div>,

@@ -106,6 +106,8 @@ Per-PR content lives in **manifests** beside your feature code. The overlay chro
 - [Multi-page tours](docs/multi-page-tours.md)
 - [Integration guide](docs/integration.md)
 - [Manifest schema](docs/manifest-schema.md)
+- [Cursor agent skill](skills/eng-handoff-tour/SKILL.md) — copy to `~/.cursor/skills/`
+- [Manifest schema](docs/manifest-schema.md)
 - [Styling](docs/styling.md)
 
 ## Requirements

@@ -348,6 +348,15 @@
   padding: 10px 16px 14px;
   border-top: 1px solid rgba(0, 102, 255, 0.2);
   flex-shrink: 0;
+  align-items: center;
+}
+
+.handoff-nav-btn--next {
+  margin-left: auto;
+}
+
+.handoff-nav-btn--skip {
+  margin-left: 0;
 }
 
 .handoff-panel-nav--intro {
@@ -370,6 +379,17 @@
   background: rgb(0, 102, 255);
   border-color: rgb(0, 102, 255);
   color: #fff;
+}
+
+.handoff-nav-btn.handoff-nav-btn--skip {
+  background: transparent;
+  border-color: transparent;
+  color: rgb(100, 116, 139);
+}
+
+.handoff-nav-btn.handoff-nav-btn--skip:hover {
+  color: #334155;
+  background: rgba(0, 102, 255, 0.06);
 }
 
 .handoff-nav-btn:disabled {
