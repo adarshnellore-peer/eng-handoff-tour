@@ -52,6 +52,10 @@ export function isHandoffEnabled(options?: HandoffEnableOptions): boolean {
     return true;
   }
 
+  if (process.env.REACT_APP_ENV === "development") {
+    return true;
+  }
+
   const suffixes = options?.hostnameSuffixes ?? [];
   if (typeof window !== "undefined" && suffixes.length > 0) {
     const { hostname } = window.location;
