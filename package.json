@@ -1,0 +1,27 @@
+{
+  "name": "eng-handoff-tour",
+  "version": "1.0.0",
+  "description": "In-app React engineering handoff walkthrough — spotlight tour, spec panel, real code excerpts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adarshnellore-peer/eng-handoff-tour.git"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "files": [
+    "src",
+    "docs",
+    "examples"
+  ],
+  "keywords": [
+    "handoff",
+    "walkthrough",
+    "engineering",
+    "react",
+    "tour",
+    "onboarding"
+  ]
+}
