@@ -113,7 +113,7 @@
   left: 24px;
   z-index: 10000;
   width: min(400px, calc(100vw - 48px));
-  max-height: 34vh;
+  max-height: 42vh;
   display: flex;
   flex-direction: column;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -137,8 +137,8 @@
 }
 
 .handoff-panel--expanded {
-  width: min(580px, calc(100vw - 48px));
-  max-height: 68vh;
+  width: min(640px, calc(100vw - 48px));
+  max-height: 78vh;
   box-shadow:
     0 16px 44px rgba(0, 102, 255, 0.28),
     0 4px 14px rgba(15, 23, 42, 0.14);
@@ -395,4 +395,154 @@
 .handoff-nav-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* ── Live component previews (Spec tab) ── */
+
+.handoff-preview-root {
+  margin-bottom: 14px;
+}
+
+.handoff-preview-section + .handoff-preview-section {
+  margin-top: 12px;
+}
+
+.handoff-preview-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(8, 145, 178);
+  margin-bottom: 8px;
+}
+
+.handoff-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 8px;
+}
+
+.handoff-preview-card {
+  border: 1px solid rgba(0, 102, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
+  overflow: hidden;
+}
+
+.handoff-preview-card-label {
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgb(71, 85, 105);
+  border-bottom: 1px solid rgba(0, 102, 255, 0.1);
+  line-height: 1.35;
+}
+
+.handoff-preview-canvas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 12px 10px;
+  background: linear-gradient(
+    180deg,
+    rgba(248, 250, 252, 0.9) 0%,
+    rgba(241, 245, 249, 0.65) 100%
+  );
+}
+
+.handoff-preview-card-tokens {
+  padding: 6px 10px 8px;
+  font-size: 10px;
+  line-height: 1.45;
+  color: rgb(100, 116, 139);
+  border-top: 1px solid rgba(0, 102, 255, 0.08);
+}
+
+.handoff-preview-stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+}
+
+.handoff-preview-card--sim-hover .handoff-preview-canvas button {
+  filter: brightness(1.06);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+}
+
+.handoff-preview-card--sim-focus .handoff-preview-canvas button {
+  outline: 2px solid rgb(0, 102, 255);
+  outline-offset: 2px;
+}
+
+.handoff-spec-section--compact {
+  margin-top: 10px;
+  opacity: 0.92;
+}
+
+.handoff-spec-section--compact .handoff-spec-section-title {
+  font-size: 10px;
+  color: rgb(100, 116, 139);
+}
+
+.handoff-spec-section--compact .handoff-spec-table {
+  font-size: 11px;
+}
+
+.handoff-inline-menu {
+  width: 100%;
+  background: #fff;
+  border: 1px solid rgb(212, 206, 200);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 12px rgba(15, 23, 42, 0.08),
+    0 1px 3px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+  text-align: left;
+}
+
+.handoff-inline-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #1e293b;
+  line-height: 1.35;
+}
+
+.handoff-inline-menu-item--selected {
+  background: rgb(254, 242, 242);
+}
+
+.handoff-inline-menu-item--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.handoff-inline-menu-item--indent {
+  padding-left: 20px;
+}
+
+.handoff-inline-menu-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.handoff-inline-menu-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.handoff-inline-menu-trailing {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.handoff-inline-menu-divider {
+  height: 1px;
+  background: rgba(15, 23, 42, 0.08);
+  margin: 2px 0;
 }

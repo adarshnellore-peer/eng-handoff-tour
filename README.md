@@ -6,6 +6,8 @@ In-app **React engineering handoff walkthrough** for UI/IA changes. The running 
 - **Intro panel** (bottom-left) — Start before step 1
 - **Spotlight** — electric-blue ring hugging the target control (no backdrop dim)
 - **Panel tabs** — Overview · Spec · Code with interaction states, behavior, a11y
+- **Live Spec previews** — real UI components per state/layout (not text-only tables)
+- **Portaled menu steps** — auto-open dropdowns + spotlight on dialog panels
 
 ## Quick start
 
@@ -60,10 +62,11 @@ See [examples/sample.manifest.ts](examples/sample.manifest.ts) and [docs/manifes
 ```tsx
 import { HandoffGate, HandoffTarget } from "@handoff";
 import { myFeatureHandoff } from "./handoffs/my-feature.manifest";
+import { myFeaturePreviews } from "./handoffs/previews";
 
 export function FeaturePage() {
   return (
-    <HandoffGate manifest={myFeatureHandoff}>
+    <HandoffGate manifest={myFeatureHandoff} previews={myFeaturePreviews}>
       <Header>
         <HandoffTarget id="save-button">
           <SaveButton />

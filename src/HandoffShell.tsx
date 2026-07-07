@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { HandoffManifest, HandoffNavigation } from "./types";
+import type { HandoffManifest, HandoffNavigation, HandoffPreviewRegistry } from "./types";
 import { HandoffProvider } from "./HandoffContext";
 import { HandoffChrome } from "./HandoffChrome";
 
@@ -9,6 +9,7 @@ interface HandoffShellProps {
   navigation?: HandoffNavigation;
   /** Enable sessionStorage persistence (recommended when steps use `route`) */
   persistTourState?: boolean;
+  previews?: HandoffPreviewRegistry;
 }
 
 /** Wraps a single feature route. For multi-page tours prefer HandoffRootLayout. */
@@ -17,12 +18,14 @@ export function HandoffShell({
   children,
   navigation,
   persistTourState,
+  previews,
 }: HandoffShellProps) {
   return (
     <HandoffProvider
       manifest={manifest}
       navigation={navigation}
-      persistTourState={persistTourState}>
+      persistTourState={persistTourState}
+      previews={previews}>
       {children}
       <HandoffChrome />
     </HandoffProvider>

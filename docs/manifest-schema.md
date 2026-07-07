@@ -26,9 +26,24 @@
 | `behaviors` | recommended | Gating, side effects, menu items |
 | `a11y` | recommended | aria-*, keyboard |
 | `code` | yes | Verbatim excerpt — never paraphrase |
+| `prepare` | portaled menus | Set `"open"` when step spotlights an open dropdown/modal panel |
 | `route` | multi-page | Pathname to navigate to before this step |
 | `routeMatch` | no | `exact` (default), `suffix`, or `includes` |
 | `routeLabel` | no | Shown while navigating, e.g. `"Project settings"` |
+
+## Live previews (Spec tab)
+
+Register `HandoffPreviewRegistry` on `HandoffShell` / `HandoffGate` / `HandoffRootLayout`:
+
+```tsx
+const previews: HandoffPreviewRegistry = {
+  "download-button": DownloadButtonPreview,
+};
+
+<HandoffGate manifest={manifest} previews={previews}>…</HandoffGate>
+```
+
+Each preview component renders real app UI (design-system `Button`, `ToggleGroup`, etc.) in a grid of state cards using `HandoffPreviewCard` / `HandoffInlineMenu`. Manifest `specRows` / `states` remain as compact token reference below the visuals.
 
 ## Multi-page tours
 
@@ -77,5 +92,30 @@ meta: {
 2. Propose steps: `targetId`, `source`, `change`
 3. Read each source file → fill `specRows`, `states`, `behaviors`, `a11y`, `code`
 4. Wrap controls with `HandoffTarget`
-5. Mount `HandoffGate` on feature route
-6. Test locally with toggle → Start → all steps
+5. Add preview components per step → pass `previews` registry to gate
+6. Mount `HandoffGate` on feature route
+
+## Portaled menus / modals
+
+When a step spotlights an **open** dropdown (rendered in a portal, not inside `HandoffTarget`):
+
+1. Add a **separate step** after the trigger step with its own `targetId`.
+2. Set `prepare: "open"` on that step (documentation for authors).
+3. In the component: auto-open on that step (`useHandoffStepActive` + set anchor/open state).
+4. Register the portal root with `useHandoffPortalTarget(id, queryFn, active)`.
+5. Close the menu when leaving that step.
+
+```tsx
+const isMenuStep = useHandoffStepActive("document-settings-menu");
+
+useEffect(() => {
+  if (isMenuStep && triggerRef.current) setAnchor(triggerRef.current);
+  else if (!isGearStep) setAnchor(null);
+}, [isMenuStep, isGearStep]);
+
+useHandoffPortalTarget(
+  "document-settings-menu",
+  () => document.querySelector('[aria-label="Document settings menu"][role="dialog"]'),
+  isMenuStep && Boolean(anchor),
+);
+```

@@ -9,6 +9,8 @@ export type {
   HandoffNavigation,
   HandoffRouteMatch,
   HandoffPersistedTourState,
+  HandoffStepPreview,
+  HandoffPreviewRegistry,
 } from "./types";
 export { isHandoffEnabled } from "./isHandoffEnabled";
 export {
@@ -28,3 +30,15 @@ export {
   measureSpotlightRect,
   readSpotlightRadius,
 } from "./spotlightUtils";
+export {
+  useHandoffPortalTarget,
+  useHandoffStepActive,
+} from "./useHandoffPortalTarget";
+export {
+  HandoffPreviewSection,
+  HandoffPreviewGrid,
+  HandoffPreviewCard,
+  HandoffPreviewStage,
+  HandoffInlineMenu,
+} from "./HandoffPreviewPrimitives";
+export type { HandoffInlineMenuItem } from "./HandoffPreviewPrimitives";

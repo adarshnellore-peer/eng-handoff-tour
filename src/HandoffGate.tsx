@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { HandoffEnableOptions, HandoffManifest, HandoffNavigation } from "./types";
+import type { HandoffEnableOptions, HandoffManifest, HandoffNavigation, HandoffPreviewRegistry } from "./types";
 import { isHandoffEnabled } from "./isHandoffEnabled";
 import { HandoffShell } from "./HandoffShell";
 
@@ -10,6 +10,7 @@ interface HandoffGateProps {
   enableOptions?: HandoffEnableOptions;
   /** Pass true when any step declares a `route` */
   persistTourState?: boolean;
+  previews?: HandoffPreviewRegistry;
 }
 
 export function HandoffGate({
@@ -18,6 +19,7 @@ export function HandoffGate({
   navigation,
   enableOptions,
   persistTourState,
+  previews,
 }: HandoffGateProps) {
   if (!isHandoffEnabled(enableOptions)) {
     return children;
@@ -27,7 +29,8 @@ export function HandoffGate({
     <HandoffShell
       manifest={manifest}
       navigation={navigation}
-      persistTourState={persistTourState}>
+      persistTourState={persistTourState}
+      previews={previews}>
       {children}
     </HandoffShell>
   );

@@ -1,3 +1,5 @@
+import type { ComponentType, ReactNode } from "react";
+
 export type HandoffRouteMatch = "exact" | "suffix" | "includes";
 
 export interface HandoffNavigation {
@@ -20,6 +22,11 @@ export interface HandoffStep {
   behaviors?: SpecRow[];
   a11y?: SpecRow[];
   code: string;
+  /**
+   * When "open", the target component should open its popover/menu on this step.
+   * Pair with useHandoffPortalTarget for portaled dropdown panels.
+   */
+  prepare?: "open";
   /**
    * App route to open before spotlighting this step.
    * Use full pathname (preferred) or a suffix segment with routeMatch: "suffix".
@@ -66,3 +73,8 @@ export interface HandoffPersistedTourState {
   tourStarted: boolean;
   stepIndex: number;
 }
+
+/** Renders live UI previews for a tour step's Spec tab (states, layout, menus). */
+export type HandoffStepPreview = ComponentType;
+
+export type HandoffPreviewRegistry = Record<string, HandoffStepPreview>;

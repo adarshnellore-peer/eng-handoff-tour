@@ -15,7 +15,7 @@ import {
 } from "./handoffPersistence";
 import { matchesHandoffRoute } from "./routeUtils";
 import { resolveSpotlightElement } from "./spotlightUtils";
-import type { HandoffManifest, HandoffNavigation, HandoffTab } from "./types";
+import type { HandoffManifest, HandoffNavigation, HandoffPreviewRegistry, HandoffTab } from "./types";
 
 interface HandoffContextValue {
   manifest: HandoffManifest;
@@ -35,8 +35,10 @@ interface HandoffContextValue {
   prevStep: () => void;
   registerTarget: (id: string, ref: RefObject<HTMLElement | null>) => void;
   unregisterTarget: (id: string) => void;
+  registerTargetElement: (id: string, element: HTMLElement | null) => void;
   getTargetElement: (id: string) => HTMLElement | null;
   getSpotlightElement: (id: string) => HTMLElement | null;
+  previews: HandoffPreviewRegistry;
 }
 
 const HandoffContext = createContext<HandoffContextValue | null>(null);
@@ -59,6 +61,8 @@ interface HandoffProviderProps {
   navigation?: HandoffNavigation;
   /** Keep tour running across route changes (required for multi-page tours) */
   persistTourState?: boolean;
+  /** Live component previews keyed by step targetId */
+  previews?: HandoffPreviewRegistry;
 }
 
 const TARGET_WAIT_MS = 12000;
@@ -69,6 +73,7 @@ export function HandoffProvider({
   children,
   navigation,
   persistTourState = false,
+  previews = {},
 }: HandoffProviderProps) {
   const persisted = persistTourState ? readPersistedTourState() : null;
   const restore =
@@ -84,6 +89,7 @@ export function HandoffProvider({
   const targetsRef = useRef<Map<string, RefObject<HTMLElement | null>>>(
     new Map(),
   );
+  const elementTargetsRef = useRef<Map<string, HTMLElement>>(new Map());
   const navigationRef = useRef(navigation);
   navigationRef.current = navigation;
 
@@ -121,7 +127,25 @@ export function HandoffProvider({
     targetsRef.current.delete(id);
   }, []);
 
+  const registerTargetElement = useCallback(
+    (id: string, element: HTMLElement | null) => {
+      if (element) {
+        elementTargetsRef.current.set(id, element);
+      } else {
+        elementTargetsRef.current.delete(id);
+      }
+    },
+    [],
+  );
+
   const getTargetElement = useCallback((id: string) => {
+    const element = elementTargetsRef.current.get(id);
+    if (element?.isConnected) {
+      return element;
+    }
+    if (element) {
+      elementTargetsRef.current.delete(id);
+    }
     const ref = targetsRef.current.get(id);
     return ref?.current ?? null;
   }, []);
@@ -299,8 +323,10 @@ export function HandoffProvider({
       prevStep,
       registerTarget,
       unregisterTarget,
+      registerTargetElement,
       getTargetElement,
       getSpotlightElement,
+      previews,
     }),
     [
       manifest,
@@ -317,8 +343,10 @@ export function HandoffProvider({
       prevStep,
       registerTarget,
       unregisterTarget,
+      registerTargetElement,
       getTargetElement,
       getSpotlightElement,
+      previews,
     ],
   );
 

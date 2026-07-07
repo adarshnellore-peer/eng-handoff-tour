@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { HandoffManifest, HandoffNavigation } from "./types";
+import type { HandoffManifest, HandoffNavigation, HandoffPreviewRegistry } from "./types";
 import { isHandoffEnabled } from "./isHandoffEnabled";
 import { HandoffProvider } from "./HandoffContext";
 import { HandoffChrome } from "./HandoffChrome";
@@ -8,6 +8,7 @@ interface HandoffRootLayoutProps {
   manifest: HandoffManifest;
   navigation?: HandoffNavigation;
   children: ReactNode;
+  previews?: HandoffPreviewRegistry;
 }
 
 /**
@@ -18,6 +19,7 @@ export function HandoffRootLayout({
   manifest,
   navigation,
   children,
+  previews,
 }: HandoffRootLayoutProps) {
   if (!isHandoffEnabled()) {
     return children;
@@ -27,7 +29,8 @@ export function HandoffRootLayout({
     <HandoffProvider
       manifest={manifest}
       navigation={navigation}
-      persistTourState>
+      persistTourState
+      previews={previews}>
       {children}
       <HandoffChrome />
     </HandoffProvider>

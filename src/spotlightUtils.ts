@@ -1,5 +1,12 @@
 /** Prefer the interactive control inside a HandoffTarget wrapper for tight spotlight fit. */
 export function resolveSpotlightElement(wrapper: HTMLElement): HTMLElement {
+  if (
+    wrapper.getAttribute("role") === "dialog" ||
+    wrapper.getAttribute("role") === "menu"
+  ) {
+    return wrapper;
+  }
+
   const marked = wrapper.querySelector<HTMLElement>("[data-handoff-spotlight]");
   if (marked) {
     return marked;

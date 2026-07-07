@@ -4,9 +4,17 @@ import { useHandoff } from "./HandoffContext";
 import type { SpecRow } from "./types";
 import { HandoffCollapseIcon, HandoffExpandIcon } from "./HandoffPanelIcons";
 
-function SpecSection({ title, rows }: { title: string; rows: SpecRow[] }) {
+function SpecSection({
+  title,
+  rows,
+  compact,
+}: {
+  title: string;
+  rows: SpecRow[];
+  compact?: boolean;
+}) {
   return (
-    <div className="handoff-spec-section">
+    <div className={`handoff-spec-section${compact ? " handoff-spec-section--compact" : ""}`}>
       <div className="handoff-spec-section-title">{title}</div>
       <table className="handoff-spec-table">
         <tbody>
@@ -37,6 +45,7 @@ export function HandoffPanel() {
     endHandoff,
     nextStep,
     prevStep,
+    previews,
   } = useHandoff();
   const [expanded, setExpanded] = useState(false);
 
@@ -89,6 +98,8 @@ export function HandoffPanel() {
   if (!currentStep) {
     return null;
   }
+
+  const StepPreview = previews[currentStep.targetId];
 
   return createPortal(
     <div
@@ -155,15 +166,33 @@ export function HandoffPanel() {
         )}
         {!isNavigating && activeTab === "spec" && (
           <>
-            <SpecSection title="Layout & tokens" rows={currentStep.specRows} />
+            {StepPreview && (
+              <div className="handoff-preview-root">
+                <StepPreview />
+              </div>
+            )}
+            <SpecSection
+              title={StepPreview ? "Token reference · layout" : "Layout & tokens"}
+              rows={currentStep.specRows}
+              compact={Boolean(StepPreview)}
+            />
             {currentStep.states && currentStep.states.length > 0 && (
               <SpecSection
-                title="Interaction states"
+                title={
+                  StepPreview
+                    ? "Token reference · states"
+                    : "Interaction states"
+                }
                 rows={currentStep.states}
+                compact={Boolean(StepPreview)}
               />
             )}
             {currentStep.a11y && currentStep.a11y.length > 0 && (
-              <SpecSection title="Accessibility" rows={currentStep.a11y} />
+              <SpecSection
+                title="Accessibility"
+                rows={currentStep.a11y}
+                compact={Boolean(StepPreview)}
+              />
             )}
           </>
         )}
