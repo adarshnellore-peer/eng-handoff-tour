@@ -71,7 +71,7 @@ Each route's components must include `<HandoffTarget id="…">` for steps on tha
 
 ## 4. What happens on Next
 
-1. Panel shows **Navigating to …**
+1. Panel shows **Navigating…**
 2. Router navigates to `step.route`
 3. Tour state persists in `sessionStorage`
 4. Polls until `HandoffTarget` mounts (up to 12s)

@@ -29,7 +29,7 @@
 | `prepare` | portaled menus | Set `"open"` when step spotlights an open dropdown/modal panel |
 | `route` | multi-page | Pathname to navigate to before this step |
 | `routeMatch` | no | `exact` (default), `suffix`, or `includes` |
-| `routeLabel` | no | Shown while navigating, e.g. `"Project settings"` |
+| `routeLabel` | no | Optional label for manifest authors (e.g. `"Project settings"`) |
 
 ## Live previews (Spec tab)
 

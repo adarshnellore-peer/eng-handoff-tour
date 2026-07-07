@@ -150,10 +150,7 @@ export function HandoffPanel() {
 
       <div className="handoff-panel-body">
         {isNavigating && (
-          <p className="handoff-navigating">
-            Navigating
-            {currentStep.routeLabel ? ` to ${currentStep.routeLabel}` : ""}…
-          </p>
+          <p className="handoff-navigating">Navigating…</p>
         )}
         {!isNavigating && activeTab === "overview" && (
           <>

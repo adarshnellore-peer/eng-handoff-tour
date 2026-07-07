@@ -122,7 +122,7 @@ Register `<HandoffTarget>` on every page that has tour steps.
 | `a11y` | aria-*, keyboard |
 | `code` | Verbatim excerpt from `source` file |
 | `route` | Pathname to navigate to before step (multi-page) |
-| `routeLabel` | Shown while navigating |
+| `routeLabel` | Optional manifest note for the step's target page |
 | `routeMatch` | `exact` (default), `suffix`, or `includes` |
 | `prepare` | `"open"` — component auto-opens popover/menu for this step |
 
@@ -263,6 +263,7 @@ See [docs/manifest-schema.md](docs/manifest-schema.md#portaled-menus--modals).
 - Intro screen with **Start** before step 1
 - Bottom-left floating panel, expandable (fullscreen icons)
 - Panel nav: **Previous** left · **Next** + **Skip** right (Skip far right, ghost style)
+- While route/target loads, panel shows **Navigating…** (no route label in UI)
 - **No backdrop dim** — app stays fully visible
 - Electric-blue spotlight on inner control border (or full dialog for menus)
 - Light cyan panel + blue stroke — isolated from product DS
