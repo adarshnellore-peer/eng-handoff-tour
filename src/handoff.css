@@ -256,6 +256,13 @@
   color: #334155;
 }
 
+.handoff-navigating {
+  font-size: 13px;
+  color: rgb(0, 102, 255);
+  font-weight: 500;
+  margin: 0;
+}
+
 .handoff-spec-section {
   margin-top: 14px;
 }

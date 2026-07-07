@@ -103,6 +103,7 @@ Per-PR content lives in **manifests** beside your feature code. The overlay chro
 
 ## Docs
 
+- [Multi-page tours](docs/multi-page-tours.md)
 - [Integration guide](docs/integration.md)
 - [Manifest schema](docs/manifest-schema.md)
 - [Styling](docs/styling.md)

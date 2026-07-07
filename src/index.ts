@@ -6,6 +6,9 @@ export type {
   HandoffEnableOptions,
   HandoffManifestMeta,
   HandoffRegistrationChange,
+  HandoffNavigation,
+  HandoffRouteMatch,
+  HandoffPersistedTourState,
 } from "./types";
 export { isHandoffEnabled } from "./isHandoffEnabled";
 export {
@@ -16,6 +19,10 @@ export {
 export { HandoffTarget } from "./HandoffTarget";
 export { HandoffShell } from "./HandoffShell";
 export { HandoffGate } from "./HandoffGate";
+export { HandoffChrome } from "./HandoffChrome";
+export { HandoffRootLayout } from "./HandoffRootLayout";
+export { useHandoffReactRouterNavigation } from "./useHandoffReactRouterNavigation";
+export { matchesHandoffRoute } from "./routeUtils";
 export {
   resolveSpotlightElement,
   measureSpotlightRect,

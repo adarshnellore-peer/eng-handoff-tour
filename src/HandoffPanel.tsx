@@ -26,6 +26,7 @@ export function HandoffPanel() {
   const {
     handoffOn,
     tourStarted,
+    isNavigating,
     manifest,
     currentStep,
     stepIndex,
@@ -137,7 +138,13 @@ export function HandoffPanel() {
       </div>
 
       <div className="handoff-panel-body">
-        {activeTab === "overview" && (
+        {isNavigating && (
+          <p className="handoff-navigating">
+            Navigating
+            {currentStep.routeLabel ? ` to ${currentStep.routeLabel}` : ""}…
+          </p>
+        )}
+        {!isNavigating && activeTab === "overview" && (
           <>
             <p>{currentStep.why}</p>
             {currentStep.behaviors && currentStep.behaviors.length > 0 && (
@@ -146,7 +153,7 @@ export function HandoffPanel() {
             <code className="handoff-source">{currentStep.source}</code>
           </>
         )}
-        {activeTab === "spec" && (
+        {!isNavigating && activeTab === "spec" && (
           <>
             <SpecSection title="Layout & tokens" rows={currentStep.specRows} />
             {currentStep.states && currentStep.states.length > 0 && (
@@ -160,7 +167,7 @@ export function HandoffPanel() {
             )}
           </>
         )}
-        {activeTab === "code" && (
+        {!isNavigating && activeTab === "code" && (
           <div className="handoff-code-wrap">
             <button
               type="button"
@@ -178,7 +185,7 @@ export function HandoffPanel() {
           type="button"
           className="handoff-nav-btn"
           onClick={prevStep}
-          disabled={stepIndex === 0}>
+          disabled={stepIndex === 0 || isNavigating}>
           Previous
         </button>
         <button type="button" className="handoff-nav-btn" onClick={endHandoff}>
@@ -187,7 +194,8 @@ export function HandoffPanel() {
         <button
           type="button"
           className="handoff-nav-btn primary"
-          onClick={nextStep}>
+          onClick={nextStep}
+          disabled={isNavigating}>
           {stepIndex >= totalSteps - 1 ? "Done" : "Next"}
         </button>
       </div>

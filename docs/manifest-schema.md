@@ -26,6 +26,14 @@
 | `behaviors` | recommended | Gating, side effects, menu items |
 | `a11y` | recommended | aria-*, keyboard |
 | `code` | yes | Verbatim excerpt — never paraphrase |
+| `route` | multi-page | Pathname to navigate to before this step |
+| `routeMatch` | no | `exact` (default), `suffix`, or `includes` |
+| `routeLabel` | no | Shown while navigating, e.g. `"Project settings"` |
+
+## Multi-page tours
+
+Steps on different routes need `route` + root-level `HandoffRootLayout` with `navigation`.
+See [multi-page-tours.md](multi-page-tours.md).
 
 ## specRows / states format
 

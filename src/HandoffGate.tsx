@@ -1,27 +1,34 @@
 import type { ReactNode } from "react";
-import type { HandoffEnableOptions, HandoffManifest } from "./types";
+import type { HandoffEnableOptions, HandoffManifest, HandoffNavigation } from "./types";
 import { isHandoffEnabled } from "./isHandoffEnabled";
 import { HandoffShell } from "./HandoffShell";
 
 interface HandoffGateProps {
   manifest: HandoffManifest;
   children: ReactNode;
-  /** Optional overrides for isHandoffEnabled (env keys, hostname suffixes) */
+  navigation?: HandoffNavigation;
   enableOptions?: HandoffEnableOptions;
+  /** Pass true when any step declares a `route` */
+  persistTourState?: boolean;
 }
 
-/**
- * Conditionally wraps children with HandoffShell when handoff gates match.
- * When disabled, renders children only — HandoffTarget becomes a no-op.
- */
 export function HandoffGate({
   manifest,
   children,
+  navigation,
   enableOptions,
+  persistTourState,
 }: HandoffGateProps) {
   if (!isHandoffEnabled(enableOptions)) {
     return children;
   }
 
-  return <HandoffShell manifest={manifest}>{children}</HandoffShell>;
+  return (
+    <HandoffShell
+      manifest={manifest}
+      navigation={navigation}
+      persistTourState={persistTourState}>
+      {children}
+    </HandoffShell>
+  );
 }
