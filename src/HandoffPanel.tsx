@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   HandoffCopyBlock,
@@ -6,12 +6,7 @@ import {
   HandoffCopyButton,
 } from "./HandoffCopyBlock";
 import { useHandoff } from "./HandoffContext";
-import type { SpecRow } from "./types";
 import { HandoffCollapseIcon, HandoffExpandIcon } from "./HandoffPanelIcons";
-
-function mergeSpecRows(...groups: (SpecRow[] | undefined)[]): SpecRow[] {
-  return groups.flatMap((rows) => rows ?? []);
-}
 
 export function HandoffPanel() {
   const {
@@ -41,17 +36,16 @@ export function HandoffPanel() {
     }
   }, [currentStep?.code]);
 
-  const designSpecRows = useMemo(
-    () =>
-      currentStep
-        ? mergeSpecRows(
-            currentStep.specRows,
-            currentStep.states,
-            currentStep.a11y,
-          )
-        : [],
-    [currentStep],
-  );
+  const copyAllCode = useCallback(() => {
+    if (!currentStep) {
+      return;
+    }
+    const blocks = currentStep.copyBlocks.map((b) => b.code).join("\n\n");
+    const all = blocks ? `${blocks}\n\n${currentStep.code}` : currentStep.code;
+    void navigator.clipboard.writeText(all);
+    setCodeCopied(true);
+    window.setTimeout(() => setCodeCopied(false), 1500);
+  }, [currentStep]);
 
   if (!handoffOn) {
     return null;
@@ -174,39 +168,55 @@ export function HandoffPanel() {
         )}
         {!isNavigating && activeTab === "spec" && (
           <>
+            <HandoffCopyableSpecSection
+              title="Dimensions & layout"
+              copyKey="spec-dimensions"
+              rows={currentStep.specRows}
+            />
+            {currentStep.states && currentStep.states.length > 0 && (
+              <HandoffCopyableSpecSection
+                title="Visual states"
+                copyKey="spec-states"
+                rows={currentStep.states}
+              />
+            )}
+            {currentStep.a11y && currentStep.a11y.length > 0 && (
+              <HandoffCopyableSpecSection
+                title="Accessibility"
+                copyKey="spec-a11y"
+                rows={currentStep.a11y}
+              />
+            )}
             {StepPreview && (
-              <div className="handoff-preview-root">
+              <div className="handoff-preview-root handoff-preview-root--reference">
                 <StepPreview />
               </div>
             )}
+          </>
+        )}
+        {!isNavigating && activeTab === "code" && (
+          <>
             {currentStep.copyBlocks.map((block, index) => (
               <HandoffCopyBlock
                 key={block.label}
                 label={block.label}
-                copyKey={`spec-block-${index}`}
+                copyKey={`code-block-${index}`}
                 text={block.code}
               />
             ))}
-            <HandoffCopyableSpecSection
-              title="Measurements & tokens"
-              copyKey="spec-design"
-              rows={designSpecRows}
-            />
-          </>
-        )}
-        {!isNavigating && activeTab === "code" && (
-          <div className="handoff-code-wrap">
-            <div className="handoff-code-header">
-              <span className="handoff-code-label">Full implementation</span>
-              <HandoffCopyButton
-                copied={codeCopied}
-                ariaLabel="Copy full implementation"
-                className="handoff-code-copy"
-                onClick={copyCode}
-              />
+            <div className="handoff-code-wrap">
+              <div className="handoff-code-header">
+                <span className="handoff-code-label">Full implementation</span>
+                <HandoffCopyButton
+                  copied={codeCopied}
+                  ariaLabel="Copy full implementation"
+                  className="handoff-code-copy"
+                  onClick={copyAllCode}
+                />
+              </div>
+              <pre className="handoff-code">{currentStep.code}</pre>
             </div>
-            <pre className="handoff-code">{currentStep.code}</pre>
-          </div>
+          </>
         )}
       </div>
 
