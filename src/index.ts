@@ -24,7 +24,7 @@ export { HandoffGate } from "./HandoffGate";
 export { HandoffChrome } from "./HandoffChrome";
 export { HandoffRootLayout } from "./HandoffRootLayout";
 export { useHandoffReactRouterNavigation } from "./useHandoffReactRouterNavigation";
-export { matchesHandoffRoute } from "./routeUtils";
+export { matchesHandoffRoute, isHandoffRouteToken } from "./routeUtils";
 export {
   resolveSpotlightElement,
   measureSpotlightRect,

@@ -13,7 +13,7 @@ import {
   readPersistedTourState,
   writePersistedTourState,
 } from "./handoffPersistence";
-import { matchesHandoffRoute } from "./routeUtils";
+import { matchesHandoffRoute, isHandoffRouteToken } from "./routeUtils";
 import { resolveSpotlightElement } from "./spotlightUtils";
 import type { HandoffManifest, HandoffNavigation, HandoffPreviewRegistry, HandoffTab } from "./types";
 
@@ -63,6 +63,8 @@ interface HandoffProviderProps {
   persistTourState?: boolean;
   /** Live component previews keyed by step targetId */
   previews?: HandoffPreviewRegistry;
+  /** Current router path — re-triggers route navigation when the user changes pages */
+  navigationPath?: string;
 }
 
 const TARGET_WAIT_MS = 12000;
@@ -74,6 +76,7 @@ export function HandoffProvider({
   navigation,
   persistTourState = false,
   previews = {},
+  navigationPath,
 }: HandoffProviderProps) {
   const persisted = persistTourState ? readPersistedTourState() : null;
   const restore =
@@ -222,6 +225,14 @@ export function HandoffProvider({
 
   const currentStep = tourStarted ? manifest.steps[stepIndex] : undefined;
 
+  const resolveStepRoute = useCallback(
+    (route: string, step: HandoffManifest["steps"][number]) => {
+      const nav = navigationRef.current;
+      return nav?.resolveRoute?.(route, step) ?? route;
+    },
+    [],
+  );
+
   // Route navigation + wait for target mount after page change
   useEffect(() => {
     if (!tourStarted || !currentStep) {
@@ -236,6 +247,8 @@ export function HandoffProvider({
       setIsNavigating(false);
       return undefined;
     }
+
+    const resolvedRoute = resolveStepRoute(route, currentStep);
 
     let cancelled = false;
     let pollId: number | undefined;
@@ -260,9 +273,15 @@ export function HandoffProvider({
 
     const run = () => {
       const currentPath = nav.getPath();
-      if (
-        matchesHandoffRoute(currentPath, route, routeMatch ?? "exact")
-      ) {
+      const onTargetRoute = isHandoffRouteToken(resolvedRoute)
+        ? matchesHandoffRoute(currentPath, "/roadmap", "includes")
+        : matchesHandoffRoute(
+            currentPath,
+            resolvedRoute,
+            routeMatch ?? "exact",
+          );
+
+      if (onTargetRoute) {
         if (getTargetElement(targetId)) {
           setIsNavigating(false);
         } else {
@@ -273,7 +292,7 @@ export function HandoffProvider({
       }
 
       setIsNavigating(true);
-      void Promise.resolve(nav.navigate(route)).then(() => {
+      void Promise.resolve(nav.navigate(resolvedRoute)).then(() => {
         if (cancelled) {
           return;
         }
@@ -289,7 +308,14 @@ export function HandoffProvider({
         window.clearInterval(pollId);
       }
     };
-  }, [tourStarted, stepIndex, currentStep, getTargetElement]);
+  }, [
+    tourStarted,
+    stepIndex,
+    currentStep,
+    getTargetElement,
+    navigationPath,
+    resolveStepRoute,
+  ]);
 
   useEffect(() => {
     if (!handoffOn) {

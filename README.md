@@ -5,8 +5,9 @@ In-app **React engineering handoff walkthrough** for UI/IA changes. The running 
 - **Toggle** (bottom-right) — flip Eng handoff on/off
 - **Intro panel** (bottom-left) — Start before step 1
 - **Spotlight** — electric-blue ring hugging the target control (no backdrop dim)
-- **Panel tabs** — Overview · Spec · Code with interaction states, behavior, a11y
-- **Live Spec previews** — real UI components per state/layout (not text-only tables)
+- **Panel tabs** — Overview · Spec · Code with copyable design spec, ship checklist, and verbatim code
+- **Live Spec previews** — real UI components per state/layout (prop-driven only; no fake hover/focus)
+- **Copy icons** — all copy actions use icons, not text labels
 - **Portaled menu steps** — auto-open dropdowns + spotlight on dialog panels
 
 ## Quick start

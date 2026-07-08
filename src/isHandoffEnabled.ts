@@ -11,13 +11,6 @@ function readEnv(key: string): string | undefined {
   if (typeof process !== "undefined" && process.env?.[key]) {
     return process.env[key];
   }
-  // Vite client
-  if (typeof import.meta !== "undefined") {
-    const meta = import.meta as ImportMeta & { env?: Record<string, string> };
-    if (meta.env?.[key]) {
-      return meta.env[key];
-    }
-  }
   return undefined;
 }
 
@@ -37,6 +30,14 @@ export function isHandoffEnabled(options?: HandoffEnableOptions): boolean {
       return false;
     }
     if (params.get("handoff") === "1") {
+      return true;
+    }
+    const { hostname } = window.location;
+    if (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "[::1]"
+    ) {
       return true;
     }
   }

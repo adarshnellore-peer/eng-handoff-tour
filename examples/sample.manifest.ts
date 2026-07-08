@@ -13,8 +13,18 @@ export const sampleHandoff: HandoffManifest = {
       targetId: "save-button",
       title: "Save button",
       change: "Text label → icon-only",
-      why: "Reduces header clutter. Same save behavior on click.",
+      why: "Writers save constantly — an icon-only control keeps the action one click away without competing with the document title for header space.",
       source: "src/components/Header/SaveButton.tsx",
+      designRecipe: `Component: Button variant="outline" tone="neutral" size="sm"
+Icon: Save · md · text.secondary
+Placement: Header right · before profile menu
+aria-label: "Save document"`,
+      acceptance: [
+        ["Icon-only", "Save icon md in text.secondary — no visible text label"],
+        ["Disabled while saving", "Spinner sm replaces icon when isSaving"],
+        ["Gating", "Hidden when readOnly"],
+        ["aria-label", '"Save document" on button'],
+      ],
       specRows: [
         ["Component", "Button variant=outline size=sm"],
         ["Icon", "Save · md · text.secondary"],

@@ -7,6 +7,11 @@ export interface HandoffNavigation {
   getPath: () => string;
   /** Navigate when a step declares a different route */
   navigate: (path: string) => void | Promise<void>;
+  /**
+   * Resolve manifest route tokens to concrete paths (e.g. inject study/document ids).
+   * Return value is used for both navigation and route matching.
+   */
+  resolveRoute?: (route: string, step: HandoffStep) => string;
 }
 
 export type SpecRow = [label: string, value: string];
@@ -15,8 +20,13 @@ export interface HandoffStep {
   targetId: string;
   title: string;
   change: string;
+  /** Design intent shown in Overview — user-facing rationale, not implementation notes. */
   why: string;
   source: string;
+  /** Copyable design recipe — component, tokens, placement (design handoff). */
+  designRecipe: string;
+  /** Copyable ship checklist for eng review before merge. */
+  acceptance: SpecRow[];
   specRows: SpecRow[];
   states?: SpecRow[];
   behaviors?: SpecRow[];

@@ -22,3 +22,8 @@ export function matchesHandoffRoute(
   }
   return current.includes(target) || currentPath.includes(stepRoute);
 }
+
+/** Deferred routes resolved at navigation time (e.g. handoff:document-roadmap). */
+export function isHandoffRouteToken(route: string): boolean {
+  return route.startsWith("handoff:");
+}

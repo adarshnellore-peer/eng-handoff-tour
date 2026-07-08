@@ -19,7 +19,9 @@
 | `targetId` | yes | Matches `<HandoffTarget id="…">` |
 | `title` | yes | Step heading |
 | `change` | yes | Short delta, e.g. `Dropdown → ToggleGroup` |
-| `why` | yes | Rationale (Overview tab) |
+| `why` | yes | Design rationale (Overview lead) — plain language, not implementation notes |
+| `designRecipe` | yes | Copyable component + tokens + placement block |
+| `acceptance` | yes | Copyable ship checklist `[label, value][]` |
 | `source` | yes | Repo-relative file path |
 | `specRows` | yes | Layout & token rows `[label, value][]` |
 | `states` | recommended | Interaction states — **required for buttons/menus** |
@@ -30,6 +32,28 @@
 | `route` | multi-page | Pathname to navigate to before this step |
 | `routeMatch` | no | `exact` (default), `suffix`, or `includes` |
 | `routeLabel` | no | Optional label for manifest authors (e.g. `"Project settings"`) |
+
+## Panel tabs
+
+| Tab | Renders |
+|-----|---------|
+| Overview | `why`, copyable `designRecipe`, `acceptance`, `behaviors`, source path |
+| Spec | Live preview grid + copyable `designRecipe` + merged design spec sheet |
+| Code | Copyable `designRecipe` + verbatim `code` |
+
+Copy actions use icon buttons (`HandoffCopyBlock`, `HandoffCopyableSpecSection`).
+
+## Writing `why`
+
+Lead with the user/workflow problem. Do not mention tour mechanics or implementation shorthand.
+
+```ts
+// Bad
+why: "Portaled menu panel under the gear trigger. Spotlight the open panel.",
+
+// Good
+why: "This is the panel users read and tap — not just the gear behind it. It puts data-source management and theme choices in one scannable list.",
+```
 
 ## Live previews (Spec tab)
 
@@ -43,7 +67,13 @@ const previews: HandoffPreviewRegistry = {
 <HandoffGate manifest={manifest} previews={previews}>…</HandoffGate>
 ```
 
-Each preview component renders real app UI (design-system `Button`, `ToggleGroup`, etc.) in a grid of state cards using `HandoffPreviewCard` / `HandoffInlineMenu`. Manifest `specRows` / `states` remain as compact token reference below the visuals.
+Each preview component renders real app UI (design-system `Button`, `ToggleGroup`, etc.) in a flex-wrap grid of state cards.
+
+**Preview rules:**
+- Only prop-driven states in cards (default, selected, open, disabled, busy)
+- Hover / focus-visible → text rows in spec sheet only — never fake in preview cards
+- `density="compact"` for small triggers; `canvasAlign="stretch"` for menus
+- Menu sub-items must match production label JSX (real `displayName`, not placeholder text)
 
 ## Multi-page tours
 
@@ -63,8 +93,8 @@ Use **CSS-property style** rows, not prose:
 For buttons, document **each state** with differing visuals:
 
 - Default
-- Hover
-- Focus-visible
+- Hover (text-only in spec if not prop-driven)
+- Focus-visible (text-only in spec if not prop-driven)
 - Disabled
 - Open / selected (menus, toggles)
 - Busy / loading (spinner)
@@ -90,10 +120,10 @@ meta: {
 
 1. `git diff main...HEAD --name-only` → filter UI `.tsx`
 2. Propose steps: `targetId`, `source`, `change`
-3. Read each source file → fill `specRows`, `states`, `behaviors`, `a11y`, `code`
+3. Read each source file → fill `why`, `designRecipe`, `acceptance`, `specRows`, `states`, `behaviors`, `a11y`, `code`
 4. Wrap controls with `HandoffTarget`
 5. Add preview components per step → pass `previews` registry to gate
-6. Mount `HandoffGate` on feature route
+6. Mount `HandoffGate` or `HandoffRootLayout`
 
 ## Portaled menus / modals
 

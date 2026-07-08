@@ -3,10 +3,10 @@ name: eng-handoff-tour
 description: >-
   Add in-app React engineering handoff walkthroughs to any project using
   eng-handoff-tour (toggle, intro panel, spotlight, live Spec previews,
-  spec/code tabs, multi-page navigation, portaled menu steps). Use when the
-  user says eng-handoff-tour, eng handoff, handoff walkthrough, handoff tour,
-  generate handoff manifest, add handoff targets, live preview in spec tab,
-  or wants engineers to tour UI changes in the live app.
+  copyable design spec, spec/code tabs, multi-page navigation, portaled menu
+  steps). Use when the user says eng-handoff-tour, eng handoff, handoff
+  walkthrough, handoff tour, generate handoff manifest, add handoff targets,
+  live preview in spec tab, or wants engineers to tour UI changes in the live app.
 ---
 
 # Eng Handoff Tour
@@ -29,6 +29,7 @@ Copy `src/` into the target app. The running React app is the canvas — never g
 - Do not build HTML handoff shells
 - Do not paraphrase code in manifest `code` fields
 - Do not style overlay chrome with the app's design system (use `handoff.css` only)
+- Do not fake hover/focus-visible in Spec preview cards (tour spotlight blue ring must never appear in specs)
 - Do not use raw Playwright `getBy*` in e2e when touching selectors (peer-fe rule)
 
 ## Module layout (in target app)
@@ -39,7 +40,8 @@ features/<feature>/
   handoffs/<id>.manifest.ts
   handoffs/previews/                      ← live Spec-tab preview components
     index.ts                              ← HandoffPreviewRegistry
-  components/HandoffGate.tsx
+    handoffPreviewFixtures.tsx            ← shared preview helpers (optional)
+  components/HandoffGate.tsx | HandoffRoot.tsx
 ```
 
 For **multi-page** tours, mount `HandoffRootLayout` at app root instead of per-route `HandoffGate`.
@@ -50,10 +52,10 @@ For **multi-page** tours, mount `HandoffRootLayout` at app root instead of per-r
 - [ ] Stage 1: Preflight — diff UI files, propose steps (+ routes if multi-page)
 - [ ] Stage 2: Copy handoff module + bundler alias
 - [ ] Stage 3: Manifest + HandoffTarget + Gate or RootLayout + navigation
-- [ ] Stage 4: specRows, states, behaviors, a11y, verbatim code
-- [ ] Stage 4b: Live preview components per step → previews registry
+- [ ] Stage 4: why, designRecipe, acceptance, specRows, states, behaviors, a11y, verbatim code
+- [ ] Stage 4b: Live preview components per step → previews registry (prop-driven states only)
 - [ ] Stage 4c: Portaled menu steps (prepare:open + useHandoffPortalTarget) when needed
-- [ ] Stage 5: Verify toggle → Start → steps (incl. cross-page + Spec visuals)
+- [ ] Stage 5: Verify toggle → Start → steps (incl. cross-page + Spec visuals + copy buttons)
 ```
 
 ### Stage 1 — Preflight
@@ -68,6 +70,7 @@ Filter `.tsx` UI changes. Propose steps with `targetId`, `source`, `change`, and
 
 1. Copy `eng-handoff-tour/src/` → `lib/handoff/` (or `shared/handoff/`)
 2. Bundler alias + tsconfig path — [docs/integration.md](docs/integration.md)
+3. Ensure `HandoffChrome` imports `./handoff.css`
 
 ### Stage 3 — Wire
 
@@ -116,8 +119,11 @@ Register `<HandoffTarget>` on every page that has tour steps.
 
 | Field | Rule |
 |-------|------|
+| `why` | **Design intent** for Overview lead — see [Writing `why`](#writing-why-overview-lead) |
+| `designRecipe` | **Required.** Copyable recipe: component, tokens, placement — not prose paragraphs |
+| `acceptance` | **Required.** Copyable ship checklist — what eng must verify before merge |
 | `specRows` | CSS-property style `[label, value]` — not prose |
-| `states` | **Required for buttons/menus** — default, hover, focus, disabled, open, busy |
+| `states` | **Required for buttons/menus** — default, hover, focus, disabled, open, busy (hover/focus text-only in spec sheet) |
 | `behaviors` | Gating, side effects, menu contents |
 | `a11y` | aria-*, keyboard |
 | `code` | Verbatim excerpt from `source` file |
@@ -126,10 +132,37 @@ Register `<HandoffTarget>` on every page that has tour steps.
 | `routeMatch` | `exact` (default), `suffix`, or `includes` |
 | `prepare` | `"open"` — component auto-opens popover/menu for this step |
 
+#### Writing `why` (Overview lead)
+
+The Overview tab opens with `why` — one or two sentences of **design rationale** for engineers and reviewers. Write for a designer explaining a decision to a builder, not for a diff comment.
+
+**Do:**
+- Lead with the user or workflow problem this solves
+- Explain *why* this placement, grouping, or pattern was chosen
+- Use plain language; name UI labels users see ("Manage data sources", "Roadmap view")
+
+**Do not:**
+- Mention tour mechanics ("spotlight", "handoff step", "prepare:open")
+- Use implementation shorthand ("portaled", "publish theme.changed", "anchor-element pattern", "plugin level")
+- Repeat token tables or component props — that belongs in `designRecipe` / Spec
+
 ```ts
-["Default", "Fill background.surface · Icon text.secondary · outline neutral"],
-{ targetId: "datasources", route: `${base}/datasources`, routeLabel: "Data sources" },
+// Bad — implementation slop
+why: "Portaled menu panel under the gear trigger. theme rows publish theme.changed. Spotlight the open panel, not just the trigger.",
+
+// Good — design justification
+why: "This is the panel users read and tap — not just the gear behind it. It puts data-source management (when allowed) and theme choices in one scannable list, so secondary settings are easy to find without leaving the editor.",
 ```
+
+#### Panel tab roles
+
+| Tab | Content |
+|-----|---------|
+| **Overview** | `why` + copyable `designRecipe` + `acceptance` + `behaviors` + source path |
+| **Spec** | live DS previews (prop-driven states only) + copyable `designRecipe` + unified design spec sheet |
+| **Code** | copyable `designRecipe` + verbatim implementation excerpt |
+
+All copy actions use **copy icons** (not "Copy" text) via `HandoffCopyBlock` / `HandoffCopyableSpecSection` / `HandoffCopyButton`.
 
 Add `data-handoff-spotlight` on the exact element for tight spotlight fit.
 
@@ -155,22 +188,21 @@ export function DownloadButtonPreview() {
     <>
       <HandoffPreviewSection title="Layout">
         <HandoffPreviewGrid>
-          <HandoffPreviewCard label="Segment · last" tokens="solid brand sm · -1px overlap">
+          <HandoffPreviewCard
+            label="Segment · last"
+            density="compact"
+            tokens="solid brand sm · -1px overlap">
             <HandoffPreviewStage>
               <Button variant="solid" tone="brand" size="sm" … />
             </HandoffPreviewStage>
           </HandoffPreviewCard>
-        </HandoffPreviewGrid>
-      </HandoffPreviewSection>
-      <HandoffPreviewSection title="Interaction states">
-        <HandoffPreviewGrid>
-          <HandoffPreviewCard label="Busy · downloading" tokens="Spinner sm · no chevron">
-            <HandoffPreviewStage>
-              <Button leadingIcon={<Spinner size="sm" />} … />
+          <HandoffPreviewCard
+            label="Menu · bottom-end"
+            canvasAlign="stretch"
+            tokens="maxWidth 251 · 3 items + divider">
+            <HandoffPreviewStage align="stretch">
+              <HandoffInlineMenu items={…} />
             </HandoffPreviewStage>
-          </HandoffPreviewCard>
-          <HandoffPreviewCard label="Hover" simulated="hover" tokens="DS hover">
-            …
           </HandoffPreviewCard>
         </HandoffPreviewGrid>
       </HandoffPreviewSection>
@@ -178,6 +210,18 @@ export function DownloadButtonPreview() {
   );
 }
 ```
+
+#### Preview card layout
+
+Cards use **flex-wrap** with `align-items: flex-start` — each card shrink-wraps to its content (no row-height stretching).
+
+| Prop | When |
+|------|------|
+| `density="compact"` | Small triggers, single icon buttons, segmented controls |
+| `canvasAlign="stretch"` | Menus, stacked trigger+menu open states |
+| `HandoffPreviewStage align="stretch"` | Vertical stacks (open trigger above menu) |
+
+**Only render states you can drive with real props** (default, selected, open, disabled, busy). Hover and focus-visible belong in the copyable spec sheet as text rows — **never** fake them in preview cards. Do not use `simulated="hover"` / `simulated="focus"` — removed from the module.
 
 3. Register in `handoffs/previews/index.ts`:
 
@@ -194,9 +238,24 @@ export const myHandoffPreviews: HandoffPreviewRegistry = {
 
 **Menu panels in previews:** DS `Menu` portals to `#ds-portal-root` — use `HandoffInlineMenu` in previews (same icons/labels/dividers/selected row) so visuals stay inside the panel. Triggers use real `Button` with production styles.
 
-**Hover / focus-visible:** use `simulated="hover"` or `simulated="focus"` on `HandoffPreviewCard` when the state is not prop-driven.
+**Sub-menu rows:** Match production label JSX exactly — e.g. attached style guides use `Row + ChevronRight + Typography` with `guide.displayName`, not generic placeholder text like "Attached Style Guide". Extract shared fixtures in `handoffPreviewFixtures.tsx`.
 
-Manifest `specRows` / `states` / `a11y` remain as compact **token reference** tables below the visual grid.
+```tsx
+// Matches production SettingsButton attached-style-guide sub-items
+export function attachedStyleGuideMenuItem(displayName: string, guideId = "preview") {
+  return {
+    key: `attached-style-guide-${guideId}`,
+    label: (
+      <Row gap="xs" align="center" style={{ paddingLeft: space("md") }}>
+        <Icon name="ChevronRight" size="xs" color="text.muted" />
+        <Typography variant="body2">{displayName}</Typography>
+      </Row>
+    ),
+  };
+}
+```
+
+Do **not** use a fake `indent` prop — indentation comes from the label's `paddingLeft` only.
 
 ### Stage 4c — Portaled menu tour steps
 
@@ -239,9 +298,11 @@ See [docs/manifest-schema.md](docs/manifest-schema.md#portaled-menus--modals).
 
 - Toggle bottom-right → intro panel → **Start**
 - Spotlight hugs inner `button` or dialog panel; expand panel for Spec grid
-- Spec tab: live preview cards for layout + each interaction state
-- Code tab is verbatim; token reference tables still present under previews
-- Multi-page: auto-navigate on Next/Prev, panel shows "Navigating…", state persists
+- Spec tab: live preview cards shrink-wrap (no excess whitespace on small triggers)
+- Overview `why` reads as design rationale, not implementation slop
+- All copy buttons show icons (checkmark briefly after copy)
+- Code tab is verbatim; design spec is copyable below previews
+- Multi-page: auto-navigate on Next/Prev, panel shows **Navigating…** (no route label), state persists
 - Portaled menu step: menu auto-opens, spotlight on dialog, closes on Next
 - Preview: `VITE_HANDOFF_ENABLED=true` / `REACT_APP_HANDOFF_ENABLED=true`
 - Production: env unset → no toggle, `HandoffTarget` is no-op
@@ -265,9 +326,10 @@ See [docs/manifest-schema.md](docs/manifest-schema.md#portaled-menus--modals).
 - Panel nav: **Previous** left · **Next** + **Skip** right (Skip far right, ghost style)
 - While route/target loads, panel shows **Navigating…** (no route label in UI)
 - **No backdrop dim** — app stays fully visible
-- Electric-blue spotlight on inner control border (or full dialog for menus)
+- Electric-blue spotlight on inner control border (or full dialog for menus) — **never in Spec previews**
 - Light cyan panel + blue stroke — isolated from product DS
-- Spec tab: **visual preview grid first**, token reference tables second
+- Spec tab: **visual preview grid first**, copyable design spec second
+- Overview lead (`why`): design rationale in plain language — not implementation notes
 - Auto-scroll target into view; auto-navigate when step declares `route`
 
 ## Reference

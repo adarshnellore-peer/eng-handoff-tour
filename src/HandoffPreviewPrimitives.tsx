@@ -23,25 +23,29 @@ export function HandoffPreviewCard({
   label,
   tokens,
   children,
-  simulated,
+  density = "auto",
+  canvasAlign = "center",
 }: {
   label: string;
   tokens?: string;
   children: ReactNode;
-  /** Hover/focus states that cannot be prop-driven */
-  simulated?: "hover" | "focus";
+  /** Compact cards shrink-wrap for small triggers and single controls. */
+  density?: "compact" | "auto";
+  canvasAlign?: "center" | "start" | "stretch";
 }) {
-  const simClass =
-    simulated === "hover"
-      ? " handoff-preview-card--sim-hover"
-      : simulated === "focus"
-        ? " handoff-preview-card--sim-focus"
-        : "";
-
   return (
-    <div className={`handoff-preview-card${simClass}`}>
+    <div
+      className={[
+        "handoff-preview-card",
+        density === "compact" ? "handoff-preview-card--compact" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}>
       <div className="handoff-preview-card-label">{label}</div>
-      <div className="handoff-preview-canvas">{children}</div>
+      <div
+        className={`handoff-preview-canvas handoff-preview-canvas--${canvasAlign}`}>
+        {children}
+      </div>
       {tokens && <div className="handoff-preview-card-tokens">{tokens}</div>}
     </div>
   );
@@ -54,12 +58,15 @@ export function HandoffPreviewStage({
   children: ReactNode;
   align?: "center" | "start" | "stretch";
 }) {
+  const alignClass =
+    align === "stretch"
+      ? "handoff-preview-stage--stretch"
+      : align === "start"
+        ? "handoff-preview-stage--start"
+        : "handoff-preview-stage--center";
+
   return (
-    <div
-      className="handoff-preview-stage"
-      style={{ justifyContent: align === "center" ? "center" : align }}>
-      {children}
-    </div>
+    <div className={`handoff-preview-stage ${alignClass}`}>{children}</div>
   );
 }
 
@@ -71,7 +78,13 @@ export interface HandoffInlineMenuItem {
   selected?: boolean;
   disabled?: boolean;
   dividerAfter?: boolean;
-  indent?: boolean;
+}
+
+function HandoffInlineMenuLabel({ label }: { label: ReactNode }) {
+  if (typeof label === "string") {
+    return <span className="handoff-inline-menu-label">{label}</span>;
+  }
+  return <div className="handoff-inline-menu-label">{label}</div>;
 }
 
 /** Inline menu surface — same item structure as DS Menu, without portaling. */
@@ -97,7 +110,6 @@ export function HandoffInlineMenu({
               "handoff-inline-menu-item",
               item.selected ? "handoff-inline-menu-item--selected" : "",
               item.disabled ? "handoff-inline-menu-item--disabled" : "",
-              item.indent ? "handoff-inline-menu-item--indent" : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -106,7 +118,7 @@ export function HandoffInlineMenu({
             {item.icon && (
               <span className="handoff-inline-menu-icon">{item.icon}</span>
             )}
-            <span className="handoff-inline-menu-label">{item.label}</span>
+            <HandoffInlineMenuLabel label={item.label} />
             {item.trailing && (
               <span className="handoff-inline-menu-trailing">{item.trailing}</span>
             )}

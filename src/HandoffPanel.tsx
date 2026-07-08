@@ -1,33 +1,16 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import {
+  HandoffCopyBlock,
+  HandoffCopyableSpecSection,
+  HandoffCopyButton,
+} from "./HandoffCopyBlock";
 import { useHandoff } from "./HandoffContext";
 import type { SpecRow } from "./types";
 import { HandoffCollapseIcon, HandoffExpandIcon } from "./HandoffPanelIcons";
 
-function SpecSection({
-  title,
-  rows,
-  compact,
-}: {
-  title: string;
-  rows: SpecRow[];
-  compact?: boolean;
-}) {
-  return (
-    <div className={`handoff-spec-section${compact ? " handoff-spec-section--compact" : ""}`}>
-      <div className="handoff-spec-section-title">{title}</div>
-      <table className="handoff-spec-table">
-        <tbody>
-          {rows.map(([label, value]) => (
-            <tr key={label}>
-              <td>{label}</td>
-              <td>{value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+function mergeSpecRows(...groups: (SpecRow[] | undefined)[]): SpecRow[] {
+  return groups.flatMap((rows) => rows ?? []);
 }
 
 export function HandoffPanel() {
@@ -48,12 +31,27 @@ export function HandoffPanel() {
     previews,
   } = useHandoff();
   const [expanded, setExpanded] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const copyCode = useCallback(() => {
     if (currentStep?.code) {
       void navigator.clipboard.writeText(currentStep.code);
+      setCodeCopied(true);
+      window.setTimeout(() => setCodeCopied(false), 1500);
     }
   }, [currentStep?.code]);
+
+  const designSpecRows = useMemo(
+    () =>
+      currentStep
+        ? mergeSpecRows(
+            currentStep.specRows,
+            currentStep.states,
+            currentStep.a11y,
+          )
+        : [],
+    [currentStep],
+  );
 
   if (!handoffOn) {
     return null;
@@ -154,11 +152,29 @@ export function HandoffPanel() {
         )}
         {!isNavigating && activeTab === "overview" && (
           <>
-            <p>{currentStep.why}</p>
+            <p className="handoff-panel-lead">{currentStep.why}</p>
+            <HandoffCopyBlock
+              label="Component recipe"
+              copyKey="overview-recipe"
+              text={currentStep.designRecipe}
+            />
+            <HandoffCopyableSpecSection
+              title="Ship checklist"
+              copyKey="overview-acceptance"
+              rows={currentStep.acceptance}
+            />
             {currentStep.behaviors && currentStep.behaviors.length > 0 && (
-              <SpecSection title="Behavior" rows={currentStep.behaviors} />
+              <HandoffCopyableSpecSection
+                title="Interaction"
+                copyKey="overview-behaviors"
+                rows={currentStep.behaviors}
+              />
             )}
-            <code className="handoff-source">{currentStep.source}</code>
+            <HandoffCopyBlock
+              label="Source file"
+              copyKey="overview-source"
+              text={currentStep.source}
+            />
           </>
         )}
         {!isNavigating && activeTab === "spec" && (
@@ -168,41 +184,38 @@ export function HandoffPanel() {
                 <StepPreview />
               </div>
             )}
-            <SpecSection
-              title={StepPreview ? "Token reference · layout" : "Layout & tokens"}
-              rows={currentStep.specRows}
-              compact={Boolean(StepPreview)}
+            <HandoffCopyBlock
+              label="Component recipe"
+              copyKey="spec-recipe"
+              text={currentStep.designRecipe}
             />
-            {currentStep.states && currentStep.states.length > 0 && (
-              <SpecSection
-                title={
-                  StepPreview
-                    ? "Token reference · states"
-                    : "Interaction states"
-                }
-                rows={currentStep.states}
-                compact={Boolean(StepPreview)}
-              />
-            )}
-            {currentStep.a11y && currentStep.a11y.length > 0 && (
-              <SpecSection
-                title="Accessibility"
-                rows={currentStep.a11y}
-                compact={Boolean(StepPreview)}
-              />
-            )}
+            <HandoffCopyableSpecSection
+              title="Design specification"
+              copyKey="spec-design"
+              rows={designSpecRows}
+            />
           </>
         )}
         {!isNavigating && activeTab === "code" && (
-          <div className="handoff-code-wrap">
-            <button
-              type="button"
-              className="handoff-code-copy"
-              onClick={copyCode}>
-              Copy
-            </button>
-            <pre className="handoff-code">{currentStep.code}</pre>
-          </div>
+          <>
+            <HandoffCopyBlock
+              label="Design recipe"
+              copyKey="code-recipe"
+              text={currentStep.designRecipe}
+            />
+            <div className="handoff-code-wrap">
+              <div className="handoff-code-header">
+                <span className="handoff-code-label">Implementation</span>
+                <HandoffCopyButton
+                  copied={codeCopied}
+                  ariaLabel="Copy implementation"
+                  className="handoff-code-copy"
+                  onClick={copyCode}
+                />
+              </div>
+              <pre className="handoff-code">{currentStep.code}</pre>
+            </div>
+          </>
         )}
       </div>
 
