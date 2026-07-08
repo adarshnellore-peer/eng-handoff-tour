@@ -147,18 +147,12 @@ export function HandoffPanel() {
         {!isNavigating && activeTab === "overview" && (
           <>
             <p className="handoff-panel-lead">{currentStep.why}</p>
-            <HandoffCopyableSpecSection
-              title="Ship checklist"
-              copyKey="overview-acceptance"
-              rows={currentStep.acceptance}
+            <HandoffCopyBlock
+              label="Component"
+              copyKey="overview-detail"
+              variant="prose"
+              text={currentStep.overview}
             />
-            {currentStep.behaviors && currentStep.behaviors.length > 0 && (
-              <HandoffCopyableSpecSection
-                title="Interaction"
-                copyKey="overview-behaviors"
-                rows={currentStep.behaviors}
-              />
-            )}
             <HandoffCopyBlock
               label="Source file"
               copyKey="overview-source"

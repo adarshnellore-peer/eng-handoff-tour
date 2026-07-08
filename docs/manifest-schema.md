@@ -19,9 +19,9 @@
 | `targetId` | yes | Matches `<HandoffTarget id="…">` |
 | `title` | yes | Step heading |
 | `change` | yes | Short delta, e.g. `Dropdown → ToggleGroup` |
-| `why` | yes | Design rationale (Overview lead) — plain language, not implementation notes |
-| `copyBlocks` | yes | Paste-ready code snippets for Spec tab — imports, JSX, config (never prose) |
-| `acceptance` | yes | Copyable ship checklist `[label, value][]` |
+| `why` | yes | Design rationale (Overview lead) — one sentence, plain language |
+| `overview` | yes | Detailed component explanation for Overview — anatomy, UX, placement, behavior in prose |
+| `copyBlocks` | yes | Paste-ready code snippets for Code tab — imports, JSX, config (never prose) |
 | `source` | yes | Repo-relative file path |
 | `specRows` | yes | Layout & token rows `[label, value][]` |
 | `states` | recommended | Interaction states — **required for buttons/menus** |
@@ -37,9 +37,9 @@
 
 | Tab | Renders |
 |-----|---------|
-| Overview | `why`, `acceptance`, `behaviors`, source path |
-| Spec | Live preview grid + **`copyBlocks`** (paste-ready snippets) + **Measurements & tokens** |
-| Code | Full verbatim `code` block |
+| Overview | `why` (lead) + `overview` (detailed component explanation) + source path |
+| Spec | **Dimensions & layout** first · visual states · accessibility · live preview at bottom |
+| Code | `copyBlocks` (paste-ready snippets) + full verbatim `code` |
 
 Copy actions use icon buttons (`HandoffCopyBlock`, `HandoffCopyableSpecSection`).
 
@@ -137,7 +137,7 @@ meta: {
 
 1. `git diff main...HEAD --name-only` → filter UI `.tsx`
 2. Propose steps: `targetId`, `source`, `change`
-3. Read each source file → fill `why`, `designRecipe`, `acceptance`, `specRows`, `states`, `behaviors`, `a11y`, `code`
+3. Read each source file → fill `why`, `overview`, `copyBlocks`, `specRows`, `states`, `behaviors`, `a11y`, `code`
 4. Wrap controls with `HandoffTarget`
 5. Add preview components per step → pass `previews` registry to gate
 6. Mount `HandoffGate` or `HandoffRootLayout`

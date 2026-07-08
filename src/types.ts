@@ -25,16 +25,17 @@ export interface HandoffStep {
   targetId: string;
   title: string;
   change: string;
-  /** Design intent shown in Overview — user-facing rationale, not implementation notes. */
+  /** One-sentence design intent — shown as the Overview lead. */
   why: string;
+  /** Detailed component explanation for Overview — anatomy, UX, placement, behavior in prose. */
+  overview: string;
   source: string;
-  /** Copy-paste snippets for Spec tab — imports, JSX, config. Must be runnable code, not prose. */
+  /** Copy-paste snippets for Code tab — imports, JSX, config. Must be runnable code, not prose. */
   copyBlocks: HandoffCopySnippet[];
-  /** Copyable ship checklist for eng review before merge. */
-  acceptance: SpecRow[];
+  /** Authoring-only — interaction notes; not shown in panel (covered by overview + code). */
+  behaviors?: SpecRow[];
   specRows: SpecRow[];
   states?: SpecRow[];
-  behaviors?: SpecRow[];
   a11y?: SpecRow[];
   code: string;
   /**

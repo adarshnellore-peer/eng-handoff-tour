@@ -52,7 +52,7 @@ For **multi-page** tours, mount `HandoffRootLayout` at app root instead of per-r
 - [ ] Stage 1: Preflight — diff UI files, propose steps (+ routes if multi-page)
 - [ ] Stage 2: Copy handoff module + bundler alias
 - [ ] Stage 3: Manifest + HandoffTarget + Gate or RootLayout + navigation
-- [ ] Stage 4: why, copyBlocks, acceptance, specRows (with px/hex), states, behaviors, a11y, verbatim code
+- [ ] Stage 4: why, overview, copyBlocks, specRows (with px/hex), states, behaviors, a11y, verbatim code
 - [ ] Stage 4b: Live preview components per step → previews registry (prop-driven states only)
 - [ ] Stage 4c: Portaled menu steps (prepare:open + useHandoffPortalTarget) when needed
 - [ ] Stage 5: Verify toggle → Start → steps (incl. cross-page + Spec visuals + copy buttons)
@@ -119,12 +119,12 @@ Register `<HandoffTarget>` on every page that has tour steps.
 
 | Field | Rule |
 |-------|------|
-| `why` | **Design intent** for Overview lead — see [Writing `why`](#writing-why-overview-lead) |
-| `copyBlocks` | **Required.** Copy-paste code snippets for Spec tab — imports, JSX, config. **Runnable code only — never prose recipes.** |
-| `acceptance` | **Required.** Copyable ship checklist — what eng must verify before merge |
+| `why` | **Design intent** for Overview lead — one sentence; see [Writing `why`](#writing-why-overview-lead) |
+| `overview` | **Required.** Detailed component explanation for Overview — anatomy, UX, placement, user workflow. Prose only; no px/hex tables or code |
+| `copyBlocks` | **Required.** Copy-paste code snippets for **Code tab** — imports, JSX, config. **Runnable code only — never prose recipes.** |
 | `specRows` | **Measurements & tokens** with px, rem, or hex values — read from DS source, not vague labels |
 | `states` | **Required for buttons/menus** — include hex/px where visuals differ |
-| `behaviors` | Gating, side effects, menu contents |
+| `behaviors` | Authoring-only interaction notes — not shown in panel (fold unique UX into `overview`; details in `code`) |
 | `a11y` | aria-*, keyboard |
 | `code` | Full verbatim implementation from `source` file (Code tab) |
 | `route` | Pathname to navigate to before step (multi-page) |
@@ -154,7 +154,7 @@ why: "Portaled menu panel under the gear trigger. theme rows publish theme.chang
 why: "This is the panel users read and tap — not just the gear behind it. It puts data-source management (when allowed) and theme choices in one scannable list, so secondary settings are easy to find without leaving the editor.",
 ```
 
-#### `copyBlocks` (Spec tab — paste-ready code)
+#### `copyBlocks` (Code tab — paste-ready snippets)
 
 Split the component into **labeled snippets an engineer can paste directly**. Read the DS source for real measurements and put those in `specRows`.
 
@@ -200,13 +200,35 @@ specRows: [
 ],
 ```
 
+#### Writing `overview` (Overview body)
+
+After the `why` lead, Overview shows a multi-paragraph **component explanation** — what the control is, where it lives in the IA, how users interact with it, and when it appears or hides.
+
+**Do:**
+- Explain anatomy and placement in the header/toolbar/page
+- Describe user-facing behavior and gating in plain language
+- Cover workflow context (why this grouping, what moved from where)
+
+**Do not:**
+- Repeat `specRows` measurements, hex values, or token names — Spec tab owns those
+- Paste JSX or prop lists — Code tab owns those
+- Duplicate the ship checklist — eng verifies via Spec + Code, not a third table
+
+```ts
+overview: `The view mode control is a two-segment ToggleGroup in the document header…
+
+It replaces a text dropdown that took too much width…
+
+Modes come from registered view-mode plugins…`,
+```
+
 #### Panel tab roles
 
 | Tab | Content |
 |-----|---------|
-| **Overview** | `why` + `acceptance` + `behaviors` + source path |
-| **Spec** | live DS previews + **`copyBlocks`** (paste-ready snippets) + **Measurements & tokens** table |
-| **Code** | full verbatim `code` block only |
+| **Overview** | `why` (lead) + `overview` (detailed component explanation) + source path |
+| **Spec** | **`Dimensions & layout`** first · visual states · accessibility · live preview reference at bottom |
+| **Code** | `copyBlocks` (imports, JSX snippets) + full verbatim `code` |
 
 All copy actions use **copy icons** (not "Copy" text) via `HandoffCopyBlock` / `HandoffCopyableSpecSection` / `HandoffCopyButton`.
 
@@ -374,7 +396,7 @@ See [docs/manifest-schema.md](docs/manifest-schema.md#portaled-menus--modals).
 - **No backdrop dim** — app stays fully visible
 - Electric-blue spotlight on inner control border (or full dialog for menus) — **never in Spec previews**
 - Light cyan panel + blue stroke — isolated from product DS
-- Spec tab: **visual preview grid first**, **copyBlocks** (paste-ready code), **measurements table** second
+- Spec tab: **dimensions & layout first**, then visual states, then preview reference at bottom
 - Overview lead (`why`): design rationale in plain language — not implementation notes
 - Auto-scroll target into view; auto-navigate when step declares `route`
 
