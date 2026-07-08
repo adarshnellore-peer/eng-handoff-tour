@@ -3,6 +3,7 @@ export type {
   HandoffStep,
   HandoffTab,
   SpecRow,
+  HandoffCopySnippet,
   HandoffEnableOptions,
   HandoffManifestMeta,
   HandoffRegistrationChange,

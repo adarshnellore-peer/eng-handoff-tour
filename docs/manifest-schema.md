@@ -20,7 +20,7 @@
 | `title` | yes | Step heading |
 | `change` | yes | Short delta, e.g. `Dropdown → ToggleGroup` |
 | `why` | yes | Design rationale (Overview lead) — plain language, not implementation notes |
-| `designRecipe` | yes | Copyable component + tokens + placement block |
+| `copyBlocks` | yes | Paste-ready code snippets for Spec tab — imports, JSX, config (never prose) |
 | `acceptance` | yes | Copyable ship checklist `[label, value][]` |
 | `source` | yes | Repo-relative file path |
 | `specRows` | yes | Layout & token rows `[label, value][]` |
@@ -37,11 +37,28 @@
 
 | Tab | Renders |
 |-----|---------|
-| Overview | `why`, copyable `designRecipe`, `acceptance`, `behaviors`, source path |
-| Spec | Live preview grid + copyable `designRecipe` + merged design spec sheet |
-| Code | Copyable `designRecipe` + verbatim `code` |
+| Overview | `why`, `acceptance`, `behaviors`, source path |
+| Spec | Live preview grid + **`copyBlocks`** (paste-ready snippets) + **Measurements & tokens** |
+| Code | Full verbatim `code` block |
 
 Copy actions use icon buttons (`HandoffCopyBlock`, `HandoffCopyableSpecSection`).
+
+## Writing `copyBlocks`
+
+Split into labeled, paste-ready snippets. Read DS source for measurements in `specRows`.
+
+```ts
+copyBlocks: [
+  { label: "Imports", code: `import { Button, Icon } from "@your/design-system";` },
+  { label: "Render", code: `<Button aria-label="Save document" … />` },
+],
+specRows: [
+  ["Button size", "sm · height 32px"],
+  ["Icon", "20px · size=\"md\""],
+],
+```
+
+Never use prose recipes like `Component: ToggleGroup · Wrapper: Row`.
 
 ## Writing `why`
 

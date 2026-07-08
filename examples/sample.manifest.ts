@@ -15,10 +15,26 @@ export const sampleHandoff: HandoffManifest = {
       change: "Text label → icon-only",
       why: "Writers save constantly — an icon-only control keeps the action one click away without competing with the document title for header space.",
       source: "src/components/Header/SaveButton.tsx",
-      designRecipe: `Component: Button variant="outline" tone="neutral" size="sm"
-Icon: Save · md · text.secondary
-Placement: Header right · before profile menu
-aria-label: "Save document"`,
+      copyBlocks: [
+        {
+          label: "Save button",
+          code: `<Button
+  variant="outline"
+  tone="neutral"
+  size="sm"
+  aria-label="Save document"
+  disabled={isSaving}
+  leadingIcon={
+    isSaving ? (
+      <Spinner size="sm" />
+    ) : (
+      <Icon name="Save" size="md" color="text.secondary" />
+    )
+  }
+  onClick={handleSave}
+/>`,
+        },
+      ],
       acceptance: [
         ["Icon-only", "Save icon md in text.secondary — no visible text label"],
         ["Disabled while saving", "Spinner sm replaces icon when isSaving"],
@@ -26,9 +42,9 @@ aria-label: "Save document"`,
         ["aria-label", '"Save document" on button'],
       ],
       specRows: [
-        ["Component", "Button variant=outline size=sm"],
-        ["Icon", "Save · md · text.secondary"],
-        ["Placement", "Header right, before profile menu"],
+        ["Button size", "sm · height 32px"],
+        ["Icon", "Save · 20px · size=\"md\" · color=\"text.secondary\""],
+        ["Placement", "Header right · before profile menu"],
       ],
       states: [
         [
@@ -47,13 +63,17 @@ aria-label: "Save document"`,
         ['aria-label', '"Save document"'],
         ["Keyboard", "Enter/Space activates"],
       ],
-      code: `      <Button
-        variant="outline"
-        size="sm"
-        aria-label="Save document"
-        disabled={isSaving}
-        onClick={handleSave}
-      />`,
+      code: `<Button
+  variant="outline"
+  tone="neutral"
+  size="sm"
+  aria-label="Save document"
+  disabled={isSaving}
+  leadingIcon={
+    isSaving ? <Spinner size="sm" /> : <Icon name="Save" size="md" color="text.secondary" />
+  }
+  onClick={handleSave}
+/>`,
     },
   ],
 };

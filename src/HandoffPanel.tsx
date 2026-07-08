@@ -153,11 +153,6 @@ export function HandoffPanel() {
         {!isNavigating && activeTab === "overview" && (
           <>
             <p className="handoff-panel-lead">{currentStep.why}</p>
-            <HandoffCopyBlock
-              label="Component recipe"
-              copyKey="overview-recipe"
-              text={currentStep.designRecipe}
-            />
             <HandoffCopyableSpecSection
               title="Ship checklist"
               copyKey="overview-acceptance"
@@ -184,38 +179,34 @@ export function HandoffPanel() {
                 <StepPreview />
               </div>
             )}
-            <HandoffCopyBlock
-              label="Component recipe"
-              copyKey="spec-recipe"
-              text={currentStep.designRecipe}
-            />
+            {currentStep.copyBlocks.map((block, index) => (
+              <HandoffCopyBlock
+                key={block.label}
+                label={block.label}
+                copyKey={`spec-block-${index}`}
+                text={block.code}
+              />
+            ))}
             <HandoffCopyableSpecSection
-              title="Design specification"
+              title="Measurements & tokens"
               copyKey="spec-design"
               rows={designSpecRows}
             />
           </>
         )}
         {!isNavigating && activeTab === "code" && (
-          <>
-            <HandoffCopyBlock
-              label="Design recipe"
-              copyKey="code-recipe"
-              text={currentStep.designRecipe}
-            />
-            <div className="handoff-code-wrap">
-              <div className="handoff-code-header">
-                <span className="handoff-code-label">Implementation</span>
-                <HandoffCopyButton
-                  copied={codeCopied}
-                  ariaLabel="Copy implementation"
-                  className="handoff-code-copy"
-                  onClick={copyCode}
-                />
-              </div>
-              <pre className="handoff-code">{currentStep.code}</pre>
+          <div className="handoff-code-wrap">
+            <div className="handoff-code-header">
+              <span className="handoff-code-label">Full implementation</span>
+              <HandoffCopyButton
+                copied={codeCopied}
+                ariaLabel="Copy full implementation"
+                className="handoff-code-copy"
+                onClick={copyCode}
+              />
             </div>
-          </>
+            <pre className="handoff-code">{currentStep.code}</pre>
+          </div>
         )}
       </div>
 

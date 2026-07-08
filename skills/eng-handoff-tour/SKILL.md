@@ -52,7 +52,7 @@ For **multi-page** tours, mount `HandoffRootLayout` at app root instead of per-r
 - [ ] Stage 1: Preflight — diff UI files, propose steps (+ routes if multi-page)
 - [ ] Stage 2: Copy handoff module + bundler alias
 - [ ] Stage 3: Manifest + HandoffTarget + Gate or RootLayout + navigation
-- [ ] Stage 4: why, designRecipe, acceptance, specRows, states, behaviors, a11y, verbatim code
+- [ ] Stage 4: why, copyBlocks, acceptance, specRows (with px/hex), states, behaviors, a11y, verbatim code
 - [ ] Stage 4b: Live preview components per step → previews registry (prop-driven states only)
 - [ ] Stage 4c: Portaled menu steps (prepare:open + useHandoffPortalTarget) when needed
 - [ ] Stage 5: Verify toggle → Start → steps (incl. cross-page + Spec visuals + copy buttons)
@@ -120,13 +120,13 @@ Register `<HandoffTarget>` on every page that has tour steps.
 | Field | Rule |
 |-------|------|
 | `why` | **Design intent** for Overview lead — see [Writing `why`](#writing-why-overview-lead) |
-| `designRecipe` | **Required.** Copyable recipe: component, tokens, placement — not prose paragraphs |
+| `copyBlocks` | **Required.** Copy-paste code snippets for Spec tab — imports, JSX, config. **Runnable code only — never prose recipes.** |
 | `acceptance` | **Required.** Copyable ship checklist — what eng must verify before merge |
-| `specRows` | CSS-property style `[label, value]` — not prose |
-| `states` | **Required for buttons/menus** — default, hover, focus, disabled, open, busy (hover/focus text-only in spec sheet) |
+| `specRows` | **Measurements & tokens** with px, rem, or hex values — read from DS source, not vague labels |
+| `states` | **Required for buttons/menus** — include hex/px where visuals differ |
 | `behaviors` | Gating, side effects, menu contents |
 | `a11y` | aria-*, keyboard |
-| `code` | Verbatim excerpt from `source` file |
+| `code` | Full verbatim implementation from `source` file (Code tab) |
 | `route` | Pathname to navigate to before step (multi-page) |
 | `routeLabel` | Optional manifest note for the step's target page |
 | `routeMatch` | `exact` (default), `suffix`, or `includes` |
@@ -144,7 +144,7 @@ The Overview tab opens with `why` — one or two sentences of **design rationale
 **Do not:**
 - Mention tour mechanics ("spotlight", "handoff step", "prepare:open")
 - Use implementation shorthand ("portaled", "publish theme.changed", "anchor-element pattern", "plugin level")
-- Repeat token tables or component props — that belongs in `designRecipe` / Spec
+- Repeat token tables or component props — that belongs in `copyBlocks` / Spec measurements
 
 ```ts
 // Bad — implementation slop
@@ -154,13 +154,59 @@ why: "Portaled menu panel under the gear trigger. theme rows publish theme.chang
 why: "This is the panel users read and tap — not just the gear behind it. It puts data-source management (when allowed) and theme choices in one scannable list, so secondary settings are easy to find without leaving the editor.",
 ```
 
+#### `copyBlocks` (Spec tab — paste-ready code)
+
+Split the component into **labeled snippets an engineer can paste directly**. Read the DS source for real measurements and put those in `specRows`.
+
+**Do:**
+- Separate blocks: Imports · Options/config · JSX render · Menu items · Handoff wiring
+- Use exact prop values from production (`size="sm"`, `aria-label="View mode"`)
+- Include a static example when production uses dynamic data (e.g. `EXAMPLE_OPTIONS` for ToggleGroup)
+
+**Do not:**
+- Write prose recipes ("Component: ToggleGroup · Wrapper: Row")
+- Omit imports or props an engineer needs to compile
+- Use placeholder text instead of real labels/icons from the design
+
+```ts
+copyBlocks: [
+  {
+    label: "Imports",
+    code: `import { Icon, Row, ToggleGroup, type ToggleOption } from "@peer/design-system";`,
+  },
+  {
+    label: "Segment options (icon-only)",
+    code: `const options: ToggleOption[] = [
+  { value: "document", icon: <Icon name="Edit" size="md" /> },
+  { value: "roadmap", icon: <Icon name="Roadmap" size="md" /> },
+];`,
+  },
+  {
+    label: "Render",
+    code: `<ToggleGroup
+  options={options}
+  value={activeMode}
+  onChange={handleChange}
+  size="sm"
+  aria-label="View mode"
+/>`,
+  },
+],
+specRows: [
+  ["Segment padding", "4px 8px (space xs · space sm)"],
+  ["Icon size", "20px · Icon size=\\"md\\""],
+  ["Border", "1px solid · border-radius 6px (radii.control)"],
+  ["Selected · background", "#FEDBDA (primary.100)"],
+],
+```
+
 #### Panel tab roles
 
 | Tab | Content |
 |-----|---------|
-| **Overview** | `why` + copyable `designRecipe` + `acceptance` + `behaviors` + source path |
-| **Spec** | live DS previews (prop-driven states only) + copyable `designRecipe` + unified design spec sheet |
-| **Code** | copyable `designRecipe` + verbatim implementation excerpt |
+| **Overview** | `why` + `acceptance` + `behaviors` + source path |
+| **Spec** | live DS previews + **`copyBlocks`** (paste-ready snippets) + **Measurements & tokens** table |
+| **Code** | full verbatim `code` block only |
 
 All copy actions use **copy icons** (not "Copy" text) via `HandoffCopyBlock` / `HandoffCopyableSpecSection` / `HandoffCopyButton`.
 
@@ -328,7 +374,7 @@ See [docs/manifest-schema.md](docs/manifest-schema.md#portaled-menus--modals).
 - **No backdrop dim** — app stays fully visible
 - Electric-blue spotlight on inner control border (or full dialog for menus) — **never in Spec previews**
 - Light cyan panel + blue stroke — isolated from product DS
-- Spec tab: **visual preview grid first**, copyable design spec second
+- Spec tab: **visual preview grid first**, **copyBlocks** (paste-ready code), **measurements table** second
 - Overview lead (`why`): design rationale in plain language — not implementation notes
 - Auto-scroll target into view; auto-navigate when step declares `route`
 

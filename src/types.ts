@@ -16,6 +16,11 @@ export interface HandoffNavigation {
 
 export type SpecRow = [label: string, value: string];
 
+export type HandoffCopySnippet = {
+  label: string;
+  code: string;
+};
+
 export interface HandoffStep {
   targetId: string;
   title: string;
@@ -23,8 +28,8 @@ export interface HandoffStep {
   /** Design intent shown in Overview — user-facing rationale, not implementation notes. */
   why: string;
   source: string;
-  /** Copyable design recipe — component, tokens, placement (design handoff). */
-  designRecipe: string;
+  /** Copy-paste snippets for Spec tab — imports, JSX, config. Must be runnable code, not prose. */
+  copyBlocks: HandoffCopySnippet[];
   /** Copyable ship checklist for eng review before merge. */
   acceptance: SpecRow[];
   specRows: SpecRow[];
